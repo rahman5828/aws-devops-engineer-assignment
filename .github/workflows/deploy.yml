@@ -6,9 +6,23 @@ on:
       - main
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ~/aws-devops-engineer-assignment
+            git pull origin main
+            docker build -t aws-devops-assignment:v1 .
+            docker stop devops-app || true
+            docker rm devops-app || true
+            docker run -d --restart unless-stopped --name devops-app -p 3000:3000 aws-devops-assignment:v1
