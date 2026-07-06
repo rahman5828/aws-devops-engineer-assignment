@@ -1,1 +1,6 @@
 node_modules/
+k6-reporter/
+load-test-report/
+*.tar.gz
+*.log
+.DS_Store
